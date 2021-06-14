@@ -1,10 +1,10 @@
 # This script defines the streamlit components for the interactive dashboard 
-# application built for the Database Systems Project Assignment.
+# application built for the Database Systems SS2021 Project Assignment.
 
 # Group: Sara Bonati - Elica Tokmakchieva - Tobias Sandmann
 #---------------------------------------------------------------------------
 
-# general utility import
+# modules import
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -12,12 +12,20 @@ import streamlit as st
 import time
 import os
 import psycopg2
-from config import config
+from scripts.database_connection import DB
 
 # directory management
 wdir = os.getcwd()                    # working directory
 sdir = os.path.join(wdir,'scripts')   # scripts directory
 ddir = os.path.join(wdir,'data')      # data directory
+
+# DB
+# Note: commands to create tables and fill them with data from csv have 
+# already been executed, the DB class will only be used to execute queries
+# relevant for the visualizations 
+#--------------------------------------------------------------------------
+database = DB(ddir)
+
 
 # APP
 #--------------------------------------------------------------------------
@@ -27,16 +35,6 @@ st.write('Test 1234')
 
 option = st.sidebar.selectbox(
     'Which number do you like best?',
-     df['first column'])
+     1)
 
 
-# progress bar
-# Add a placeholder
-latest_iteration = st.empty()
-bar = st.progress(0)
-
-for i in range(100):
-  # Update the progress bar with each iteration.
-  latest_iteration.text(f'Iteration {i+1}')
-  bar.progress(i + 1)
-  time.sleep(0.1)
