@@ -1,4 +1,4 @@
-# Health section of the DBS Project dashboard
+# Pollution section of the DBS Project dashboard
 # (the multi-app framework is taken from https://github.com/upraneelnihar/streamlit-multiapps)
 
 import streamlit as st
@@ -7,11 +7,9 @@ import numpy as np
 
 
 def app():
-    st.title('Health')
+    st.title('Pollution')
 
     st.write("This is a sample health page in the mutliapp.")
-    st.write("See `apps/health.py` to know how to use it.")
+    st.write("See `apps/pollution.py` to know how to use it.")
 
-    st.markdown("### Health visualization")
-
-    st.write('Navigate to `home` page to visualize the data')
+    st.markdown("### Pollution visualization")

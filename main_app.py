@@ -12,7 +12,7 @@ import streamlit as st
 import time
 import os
 import psycopg2
-from scripts.database_connection import DB
+#from scripts.database_connection import DB
 from multiapp import MultiApp
 from apps import home, health # import your app modules here
 
@@ -27,7 +27,7 @@ ddir = os.path.join(wdir,'data')      # data directory
 # already been executed, the DB class will only be used to execute queries
 # relevant for the visualizations 
 #--------------------------------------------------------------------------
-database = DB(ddir)
+#database = DB(ddir)
 
 
 app = MultiApp()
