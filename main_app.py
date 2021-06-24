@@ -13,6 +13,9 @@ import time
 import os
 import psycopg2
 from scripts.database_connection import DB
+from multiapp import MultiApp
+from apps import home, health # import your app modules here
+
 
 # directory management
 wdir = os.getcwd()                    # working directory
@@ -27,14 +30,23 @@ ddir = os.path.join(wdir,'data')      # data directory
 database = DB(ddir)
 
 
+app = MultiApp()
+
+# Add all your application here
+app.add_app("Home", home.app)
+app.add_app("Data Stats", health.app)
+
+# The main app
+app.run()
+
+
 # APP
 #--------------------------------------------------------------------------
 # intro to app
-st.title('DBS Project')
-st.write('Test 1234')
+#st.title('DBS Project')
+#st.write('Test 1234')
 
-option = st.sidebar.selectbox(
-    'Which number do you like best?',
-     1)
-
+#option = st.sidebar.selectbox(
+#    'Which number do you like best?',
+#     1)
 
