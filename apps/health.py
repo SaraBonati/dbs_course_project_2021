@@ -4,14 +4,79 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os 
+import plotly.express as px
+from plotly.subplots import make_subplots
 
+# directory management 
+wdir           = os.getcwd()
+ddir           = os.path.join(wdir,'data')
+raw_data_dir   = os.path.join(ddir,'raw')
+final_data_dir = os.path.join(ddir,'final')
+
+def get_gdp_ranking(df,option_country):
+    years = [1960,1970,1980,1990,2000,2010,2019]
+    rankings = []
+    for year in years:
+        r = df[df['Year']==year].sort_values(by='Gdp', ascending=False).reset_index()
+        idx = r.index[r['Country Name']==option_country][0]
+        rankings.append(idx+1)
+    return  pd.DataFrame({'Year': years,
+                          'Ranking':rankings})
 
 def app():
-    st.title('Health')
+    
+    # import data (note: I am using the csv file to try the visualizations first, 
+    # in the final app the data to be visualized will be obtained via SQL query)
+    health = pd.read_csv(os.path.join(final_data_dir,'HEALTH.csv'),header=0)
+    country = pd.read_csv(os.path.join(final_data_dir,'COUNTRY.csv'),header=0)
+    gdp = pd.read_csv(os.path.join(final_data_dir,'GDP.csv'),header=0)
 
-    st.write("This is a sample health page in the mutliapp.")
-    st.write("See `apps/health.py` to know how to use it.")
+    st.title('Health')
+    
+    option_world = st.sidebar.selectbox('What part of the world do you want to select?',
+                                  country['Part_of_World'].unique())
+
+    option_country = st.sidebar.selectbox('What country would you like to visualize?',
+                                  country[country['Part_of_World']==option_world]['Country Name'].unique())
+
 
     st.markdown("### Health visualization")
+    
+    st.write("Where does this country position itself in the world with respect to GDP?")
+    #fig = px.line(gdp[gdp['Country Name']==option_country], x="Year", y="Gdp", title='Gross domestic product (GDP) in '+option_country)
+    #st.plotly_chart(fig)
+    st.dataframe(get_gdp_ranking(gdp,option_country))
 
-    st.write('Navigate to `home` page to visualize the data')
+    st.write("What share of its GDP does this country spend on health?")
+    result = pd.merge(health[health['Entity']==option_country],
+                     gdp,
+                     how='left',
+                     left_on=['Entity','Year'],
+                     right_on=['Country Name','Year'],
+                     suffixes=('', '_y'),
+                     indicator=True).fillna(np.nan)
+
+    fig = px.bar(result[result['_merge']=='both'], x="Year", y=["Gdp", "share_gdp_health"])
+    st.plotly_chart(fig)
+
+    st.write("What about mental health in this country?")
+    
+    subfig = make_subplots(specs=[[{"secondary_y": True}]])
+    # create two independent figures with px.line each containing data from multiple columns
+    fig = px.line(health[health['Entity']==option_country & health['Year']>=1990], x='Year',y='mental_health_daly')
+    fig2 = px.line(health[health['Entity']==option_country & health['Year']>=1990],x='Year',y='mental_health_share')
+    fig2.update_traces(yaxis="y2")
+
+    subfig.add_traces(fig.data + fig2.data)
+    subfig.layout.xaxis.title="Year"
+    subfig.layout.yaxis.title="Mental health impact (DALY units)"
+    subfig.layout.yaxis2.title=r"% of population with mental health problems "
+    # recoloring is necessary otherwise lines from fig und fig2 would share each color
+    # e.g. Linear-, Log- = blue; Linear+, Log+ = red... we don't want this
+    subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
+    st.plotly_chart(subfig)
+
+
+
+    
