@@ -35,7 +35,7 @@ def create_db(db_name):
         connection = psycopg2.connect(
                 dbname="postgres",
                 user="postgres",
-                password="postgres",
+                password="assign9",
                 host="localhost",
                 port="5432")
 

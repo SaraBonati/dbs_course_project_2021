@@ -105,7 +105,7 @@ def create_tables(dbname):
         connection = psycopg2.connect(
                 dbname=dbname,
                 user="postgres",
-                password="postgres",
+                password="assign9",
                 host="localhost",
                 port="5432")
 

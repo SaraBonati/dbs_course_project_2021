@@ -7,12 +7,16 @@ import numpy as np
 import os 
 import plotly.express as px
 from plotly.subplots import make_subplots
+from apps.database_connection import DB
 
 # directory management 
 wdir           = os.getcwd()
 ddir           = os.path.join(wdir,'data')
 raw_data_dir   = os.path.join(ddir,'raw')
 final_data_dir = os.path.join(ddir,'final')
+
+# database class (to handle connecion to DB + execute and retrieve query results)
+db = DB('dbs_project')
 
 def get_gdp_ranking(df,option_country):
     years = [1960,1970,1980,1990,2000,2010,2019]
@@ -33,12 +37,25 @@ def app():
     gdp = pd.read_csv(os.path.join(final_data_dir,'GDP.csv'),header=0)
 
     st.title('Health')
+
+    query_part_of_world = """
+                          SELECT DISTINCT partofworld
+                          FROM public.country;  
+                          """
+    
+    #option_world = st.sidebar.selectbox('What part of the world do you want to select?',
+    #                              country['Part_of_World'].unique())
     
     option_world = st.sidebar.selectbox('What part of the world do you want to select?',
-                                  country['Part_of_World'].unique())
+                                  pd.read_sql_query(query_part_of_world,db.conn))
 
+    query_country = ("SELECT DISTINCT name "
+                     "FROM public.country "
+                     "WHERE partofworld='{0}'; ").format(option_world)
+    
     option_country = st.sidebar.selectbox('What country would you like to visualize?',
-                                  country[country['Part_of_World']==option_world]['Country Name'].unique())
+                                    pd.read_sql_query(query_country,db.conn))
+                                  #country[country['Part_of_World']==option_world]['Country Name'].unique())
 
 
     st.markdown("### Health visualization")
@@ -49,13 +66,23 @@ def app():
     st.dataframe(get_gdp_ranking(gdp,option_country))
 
     st.write("What share of its GDP does this country spend on health?")
-    result = pd.merge(health[health['Entity']==option_country],
-                     gdp,
-                     how='left',
-                     left_on=['Entity','Year'],
-                     right_on=['Country Name','Year'],
-                     suffixes=('', '_y'),
-                     indicator=True).fillna(np.nan)
+
+    query1 = ("SELECT year,value,share_gdp_health"
+              "FROM public.gdp G ,public.health H"
+              "WHERE G.cname=H.cname"
+              "AND G.year=H.year"
+              "AND G.cname='{0}'").format(option_country)
+
+
+    #result = pd.merge(health[health['Entity']==option_country],
+    #                 gdp,
+    #                 how='left',
+    #                 left_on=['Entity','Year'],
+    #                 right_on=['Country Name','Year'],
+    #                 suffixes=('', '_y'),
+    #                 indicator=True).fillna(np.nan)
+
+    result = pd.read_sql_query(query1,db.conn)
 
     fig = px.bar(result[result['_merge']=='both'], x="Year", y=["Gdp", "share_gdp_health"])
     st.plotly_chart(fig)

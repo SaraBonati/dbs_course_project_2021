@@ -14,7 +14,7 @@ import os
 import psycopg2
 #from scripts.database_connection import DB
 from multiapp import MultiApp
-from apps import home, health # import your app modules here
+from apps import home, health, pollution # import your app modules here
 
 
 # directory management
@@ -35,6 +35,7 @@ app = MultiApp()
 # Add all your application here
 app.add_app("Home", home.app)
 app.add_app("Health", health.app)
+app.add_app("Pollution", pollution.app)
 
 # The main app
 app.run()
