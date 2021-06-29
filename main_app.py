@@ -34,19 +34,9 @@ app = MultiApp()
 
 # Add all your application here
 app.add_app("Home", home.app)
-app.add_app("Data Stats", health.app)
+app.add_app("Health", health.app)
 
 # The main app
 app.run()
 
-
-# APP
-#--------------------------------------------------------------------------
-# intro to app
-#st.title('DBS Project')
-#st.write('Test 1234')
-
-#option = st.sidebar.selectbox(
-#    'Which number do you like best?',
-#     1)
 
