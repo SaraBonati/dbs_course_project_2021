@@ -30,8 +30,7 @@ def get_gdp_ranking(df,option_country):
 
 def app():
     
-    # import data (note: I am using the csv file to try the visualizations first, 
-    # in the final app the data to be visualized will be obtained via SQL query)
+    # import data (note: I am using the csv file only for the ranking)
     health = pd.read_csv(os.path.join(final_data_dir,'HEALTH.csv'),header=0)
     country = pd.read_csv(os.path.join(final_data_dir,'COUNTRY.csv'),header=0)
     gdp = pd.read_csv(os.path.join(final_data_dir,'GDP.csv'),header=0)
@@ -43,9 +42,6 @@ def app():
                           FROM public.country;  
                           """
     
-    #option_world = st.sidebar.selectbox('What part of the world do you want to select?',
-    #                              country['Part_of_World'].unique())
-    
     option_world = st.sidebar.selectbox('What part of the world do you want to select?',
                                   pd.read_sql_query(query_part_of_world,db.conn))
 
@@ -55,15 +51,14 @@ def app():
     
     option_country = st.sidebar.selectbox('What country would you like to visualize?',
                                     pd.read_sql_query(query_country,db.conn))
-                                  #country[country['Part_of_World']==option_world]['Country Name'].unique())
 
-
-    st.markdown("### Health visualization")
+    #------------------------------------------------------------------------------------
     
     st.write("Where does this country position itself in the world with respect to GDP?")
-    #fig = px.line(gdp[gdp['Country Name']==option_country], x="Year", y="Gdp", title='Gross domestic product (GDP) in '+option_country)
-    #st.plotly_chart(fig)
-    st.dataframe(get_gdp_ranking(gdp,option_country))
+    if len(get_gdp_ranking(gdp,option_country))==0:
+        st.markdown("There is no data available for this country :disappointed:")
+    else:
+        st.dataframe(get_gdp_ranking(gdp,option_country))
 
     st.write("What share of its GDP does this country spend on health?")
 
@@ -73,20 +68,13 @@ def app():
               "AND G.year=H.year "
               "AND G.cname='{0}'; ").format(option_country)
 
-
-    #result = pd.merge(health[health['Entity']==option_country],
-    #                 gdp,
-    #                 how='left',
-    #                 left_on=['Entity','Year'],
-    #                 right_on=['Country Name','Year'],
-    #                 suffixes=('', '_y'),
-    #                 indicator=True).fillna(np.nan)
-
     result = pd.read_sql_query(query1,db.conn)
-    st.dataframe(result)
-
-    fig = px.bar(result, x="year", y="share_gdp_health")
-    st.plotly_chart(fig)
+    if len(result)==0:
+        st.markdown("There is no data available for this country :disappointed:")
+    else:
+        st.dataframe(result)
+        fig = px.bar(result, x="year", y="share_gdp_health")
+        st.plotly_chart(fig)
 
     st.write("What about mental health in this country?")
 
@@ -97,22 +85,24 @@ def app():
               "AND G.cname='{0}'; ").format(option_country)
     
     result2 = pd.read_sql_query(query2,db.conn)
-    print(pd.read_sql_query(query2,db.conn))
+    if len(result2)==0:
+        st.markdown("There is no data available for this country :disappointed:")
+    else:
 
-    #subfig = make_subplots(specs=[[{"secondary_y": True}]])
-    # create two independent figures with px.line each containing data from multiple columns
-    #fig = px.line(result2, x='year',y='mental_health_daly')
-    #fig2 = px.line(result2,x='year',y='mental_health_share')
-    #fig2.update_traces(yaxis="y2")
+        subfig = make_subplots(specs=[[{"secondary_y": True}]])
+        # create two independent figures with px.line each containing data from multiple columns
+        fig = px.line(result2, x='year',y='mental_health_daly')
+        fig2 = px.line(result2,x='year',y='mental_health_share')
+        fig2.update_traces(yaxis="y2")
 
-    #subfig.add_traces(fig.data + fig2.data)
-    #subfig.layout.xaxis.title="Year"
-    #subfig.layout.yaxis.title="Mental health impact (DALY units)"
-    #subfig.layout.yaxis2.title=r"% of population with mental health problems "
-    # recoloring is necessary otherwise lines from fig und fig2 would share each color
-    # e.g. Linear-, Log- = blue; Linear+, Log+ = red... we don't want this
-    #subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
-    #st.plotly_chart(subfig)
+        subfig.add_traces(fig.data + fig2.data)
+        subfig.layout.xaxis.title="Year"
+        subfig.layout.yaxis.title="Mental health impact (DALY units)"
+        subfig.layout.yaxis2.title="Share of population with mental health problems "
+        # recoloring is necessary otherwise lines from fig und fig2 would share each color
+        # e.g. Linear-, Log- = blue; Linear+, Log+ = red... we don't want this
+        subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
+        st.plotly_chart(subfig)
 
 
 

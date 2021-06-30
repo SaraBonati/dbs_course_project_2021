@@ -43,21 +43,21 @@ class DB():
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
-    def convert_query_to_sql(self, q):
-        """
-        This function converts a Python string/object data type in
-        appropriate
+    #def convert_query_to_sql(self, q):
+    #    """
+    #    This function converts a Python string/object data type in
+    #    appropriate
 
-        Inputs:
-        - q: query in string format
-        Outputs:
-        - None
-        """
+    #    Inputs:
+    #    - q: query in string format
+    #    Outputs:
+    #    - None
+    #    """
 
         # Query the database and obtain data as pandas dataframe (simpler for
         # our purposes)
-        res = pd.read_sql_query(q, self.conn)
-        return res
+    #    res = pd.read_sql_query(q, self.conn)
+    #    return res
 
     def close_connection(self):
         """
