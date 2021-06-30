@@ -71,7 +71,7 @@ def app():
               "FROM public.gdp G ,public.health H"
               "WHERE G.cname=H.cname"
               "AND G.year=H.year"
-              "AND G.cname='{0}'").format(option_country)
+              "AND G.cname='{0}';").format(option_country)
 
 
     #result = pd.merge(health[health['Entity']==option_country],

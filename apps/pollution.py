@@ -62,8 +62,8 @@ def app():
 
     query1 = ("SELECT year,co2"
               "FROM public.pollution P"
-              "WHERE P.cname={0}"
-              "ORDER BY year").format(option_country)
+              "WHERE P.cname='{0}'"
+              "ORDER BY year;").format(option_country)
 
 
     result = pd.read_sql_query(query1,db.conn)
