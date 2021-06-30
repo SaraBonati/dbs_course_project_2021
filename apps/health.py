@@ -67,11 +67,11 @@ def app():
 
     st.write("What share of its GDP does this country spend on health?")
 
-    query1 = ("SELECT year,value,share_gdp_health"
-              "FROM public.gdp G ,public.health H"
-              "WHERE G.cname=H.cname"
-              "AND G.year=H.year"
-              "AND G.cname='{0}';").format(option_country)
+    query1 = ("SELECT G.year,G.value,H.share_gdp_health "
+              "FROM public.gdp G ,public.health H "
+              "WHERE G.cname=H.cname "
+              "AND G.year=H.year "
+              "AND G.cname='{0}'; ").format(option_country)
 
 
     #result = pd.merge(health[health['Entity']==option_country],
@@ -83,26 +83,36 @@ def app():
     #                 indicator=True).fillna(np.nan)
 
     result = pd.read_sql_query(query1,db.conn)
+    st.dataframe(result)
 
-    fig = px.bar(result[result['_merge']=='both'], x="Year", y=["Gdp", "share_gdp_health"])
+    fig = px.bar(result, x="year", y="share_gdp_health")
     st.plotly_chart(fig)
 
     st.write("What about mental health in this country?")
-    
-    subfig = make_subplots(specs=[[{"secondary_y": True}]])
-    # create two independent figures with px.line each containing data from multiple columns
-    fig = px.line(health[health['Entity']==option_country & health['Year']>=1990], x='Year',y='mental_health_daly')
-    fig2 = px.line(health[health['Entity']==option_country & health['Year']>=1990],x='Year',y='mental_health_share')
-    fig2.update_traces(yaxis="y2")
 
-    subfig.add_traces(fig.data + fig2.data)
-    subfig.layout.xaxis.title="Year"
-    subfig.layout.yaxis.title="Mental health impact (DALY units)"
-    subfig.layout.yaxis2.title=r"% of population with mental health problems "
+    query2 = ("SELECT G.year,G.value,H.mental_health_daly,H.mental_health_share "
+              "FROM public.gdp G ,public.health H "
+              "WHERE G.cname=H.cname "
+              "AND G.year=H.year "
+              "AND G.cname='{0}'; ").format(option_country)
+    
+    result2 = pd.read_sql_query(query2,db.conn)
+    print(pd.read_sql_query(query2,db.conn))
+
+    #subfig = make_subplots(specs=[[{"secondary_y": True}]])
+    # create two independent figures with px.line each containing data from multiple columns
+    #fig = px.line(result2, x='year',y='mental_health_daly')
+    #fig2 = px.line(result2,x='year',y='mental_health_share')
+    #fig2.update_traces(yaxis="y2")
+
+    #subfig.add_traces(fig.data + fig2.data)
+    #subfig.layout.xaxis.title="Year"
+    #subfig.layout.yaxis.title="Mental health impact (DALY units)"
+    #subfig.layout.yaxis2.title=r"% of population with mental health problems "
     # recoloring is necessary otherwise lines from fig und fig2 would share each color
     # e.g. Linear-, Log- = blue; Linear+, Log+ = red... we don't want this
-    subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
-    st.plotly_chart(subfig)
+    #subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
+    #st.plotly_chart(subfig)
 
 
 

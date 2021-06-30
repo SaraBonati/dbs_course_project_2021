@@ -60,10 +60,19 @@ def app():
 
     st.markdown("### Pollution visualization")
 
-    query1 = ("SELECT year,co2"
-              "FROM public.pollution P"
-              "WHERE P.cname='{0}'"
-              "ORDER BY year;").format(option_country)
+    query1 = ("SELECT P.year,P.co2 "
+              "FROM public.pollution P "
+              "WHERE P.cname='{0}' "
+              "ORDER BY P.year; ").format(option_country)
+
+
+    query2 = ("SELECT P.year,SUM(P.co2) AS sumco2 "
+             "FROM public.pollution P "
+             "WHERE P.cname IN (SELECT C.name "
+             "                   FROM public.country C "
+             "                   WHERE C.partofworld='{0}') "
+             "GROUP BY P.year "
+             "ORDER BY P.year; ").format(option_world)
 
 
     result = pd.read_sql_query(query1,db.conn)
@@ -71,3 +80,9 @@ def app():
     fig = px.bar(result, x="year", y="co2", text='co2')
     fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
     st.plotly_chart(fig)
+
+    result2 = pd.read_sql_query(query2,db.conn)
+    st.write("How much CO2 overall has the part of the world of this country emitted over the years?")
+    fig2 = px.bar(result2, x="year", y="sumco2")
+    fig2.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+    st.plotly_chart(fig2)
