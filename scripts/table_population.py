@@ -3,7 +3,7 @@
 
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as autocommit
-import os
+
 
 def populate_tables(dbname):
     """
