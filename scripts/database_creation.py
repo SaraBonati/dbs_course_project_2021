@@ -22,7 +22,7 @@ def db_exists(cursor, db_name):
     return cursor.fetchone()
 
 
-def create_db(db_name):
+def create_db(db_name, user, password):
     """
     Create new PostgreSQL database
 
@@ -34,8 +34,8 @@ def create_db(db_name):
         # Connect to PostgreSQL server
         connection = psycopg2.connect(
                 dbname="postgres",
-                user="postgres",
-                password="assign9",
+                user=user,
+                password=password,
                 host="localhost",
                 port="5432")
 
@@ -66,4 +66,4 @@ def create_db(db_name):
 
 
 if __name__ == "__main__":
-    create_db("dbs_project")
+    create_db("dbs_project", "postgres", "postgres")

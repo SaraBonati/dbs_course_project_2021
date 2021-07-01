@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as autocommit
 
 
-def populate_tables(dbname):
+def populate_tables(dbname, user, password):
     """
     Populate PostgreSQL tables with data from CSV files
     """
@@ -22,8 +22,8 @@ def populate_tables(dbname):
         # Connect to PostgreSQL server
         connection = psycopg2.connect(
                 dbname=dbname,
-                user="postgres",
-                password="assign9",
+                user=user,
+                password=password,
                 host="localhost",
                 port="5432")
 
@@ -49,4 +49,4 @@ def populate_tables(dbname):
 
 
 if __name__ == "__main__":
-    populate_tables("dbs_project")
+    populate_tables("dbs_project", "postgres", "postgres")
