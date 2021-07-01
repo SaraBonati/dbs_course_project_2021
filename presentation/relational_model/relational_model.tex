@@ -1,0 +1,102 @@
+\documentclass[11pt,a4paper,DIV=12,headings=small,numbers,egregdoesnotlikesansseriftitles]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{cmap}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+% \usepackage{tgpagella}
+% \usepackage{charter}
+% \usepackage{fourier}
+% \usepackage{kpfonts}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{nicefrac}
+\usepackage{enumerate}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[colorlinks]{hyperref}
+\usepackage{caption}
+\usepackage{braket}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{tikz}
+
+\DeclareMathOperator{\lex}{lex}
+\DeclareMathOperator{\modulo}{modulo}
+
+\newcommand{\myeq}[1]{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily #1}}}{=}}}
+\newcommand{\myleq}[1]{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily #1}}}{\leq}}}
+\newcommand{\mygeq}[1]{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily #1}}}{\geq}}}
+%\def\mat#1#2{\left(\begin{array}{#1}#2\end{array}\right)}
+\newcommand{\mat}[2]{\begin{pmatrix*}[#1]#2\end{pmatrix*}}
+\newcommand{\matnb}[2]{\begin{array}{#1}#2\end{array}}
+\newcommand{\colvec}[2]{\begin{pmatrix*}[#1]#2\end{pmatrix*}}
+\newcommand{\mydet}[2]{\begin{vmatrix*}[#1]#2\end{vmatrix*}}
+%\definecolor{midnightgreen}{HTML}{4E5851}
+\newsavebox\MBox{}
+\newcommand\Cline[2][cyan]{{\sbox\MBox{$#2$}%
+  \rlap{\usebox\MBox}\color{#1}\rule[-1.2\dp\MBox]{\wd\MBox}{0.5pt}}}
+\newcommand\aug{\fboxsep=-\fboxrule\!\!\!\fbox{\strut}\!\!\!}
+\renewcommand{\thesection}{Exercise~\arabic{section}}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\specdashsolid}[1]{%
+    \tikz[baseline=(todotted.base)]{%
+        \node[inner sep=.5pt, outer sep=0pt] (todotted) {#1};
+        \draw[densely dashed] ([yshift=-1pt]todotted.south west) -- ([yshift=-1pt]todotted.south east);
+        \draw([yshift=-3pt]todotted.south west) -- ([yshift=-3pt]todotted.south east);
+    }%
+}%
+
+\newcommand{\specsolid}[1]{%
+    \tikz[baseline=(todotted.base)]{%
+        \node[inner sep=.5pt, outer sep=0pt] (todotted) {#1};
+        \draw([yshift=-1pt]todotted.south west) -- ([yshift=-1pt]todotted.south east);
+    }%
+}%
+
+\newcommand{\specdashed}[1]{%
+    \tikz[baseline=(todotted.base)]{%
+        \node[inner sep=.5pt, outer sep=0pt] (todotted) {#1};
+        \draw[densely dashed]([yshift=-1pt]todotted.south west) -- ([yshift=-1pt]todotted.south east);
+    }%
+}%
+
+\newcommand{\specsoliddash}[1]{%
+    \tikz[baseline=(todotted.base)]{%
+        \node[inner sep=.5pt, outer sep=0pt] (todotted) {#1};
+        \draw([yshift=-1pt]todotted.south west) -- ([yshift=-1pt]todotted.south east);
+        \draw[densely dashed]([yshift=-3pt]todotted.south west) -- ([yshift=-3pt]todotted.south east);
+    }%
+}%
+
+\begin{document}
+    \pagestyle{plain}
+
+    \begin{itemize}[leftmargin=*]
+        \item
+            \textbf{Country}(\specsolid{name}, code, partofworld)
+        \item
+            \textbf{Population}(\specsolid{\specdashed{cname}, year}, count, growth, \detokenize{share_urban}, \detokenize{share_sanitation})
+        \item
+            \textbf{CO2}(\specsolid{\specdashed{cname},year}, co2, \detokenize{indoor_death_rate}, \detokenize{outdoor_death_rate})
+        \item
+            \textbf{GDP}(\specsolid{\specdashed{cname}, year}, value)
+        \item
+            \textbf{Health}(\specsolid{\specdashed{cname}, year}, \detokenize{life_exp}, \detokenize{mental_health_daly}, \detokenize{mental_health_share})
+        \item
+            \textbf{Security}(\specsolid{\specdashed{cname}, year}, \detokenize{unemployment_rate}, \detokenize{avg_annual_working_hours}, \detokenize{homicide_rade}, \detokenize{hr_score}, \detokenize{hr_violations}, happiness, trust)
+        \item
+            \textbf{Education}(\specsolid{\specdashed{cname}, year}, \detokenize{share_gdp_primary}, \detokenize{share_gdp_secondary}, \detokenize{share_gdp_tertiary}, \detokenize{primary_rate}, \detokenize{secondary_rate}, \detokenize{share_pop_tertiary})
+    \end{itemize}
+\end{document}

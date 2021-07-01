@@ -1,3 +1,14 @@
 data/postgres-data/pg_stat_tmp/**
 data/postgres-data
 **/__pycache__
+
+*.pdf
+*.o
+*.o.d
+*.d
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
