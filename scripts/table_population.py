@@ -33,8 +33,7 @@ def populate_tables(dbname):
 
         # Populate all tables one after the other
         for filename in filenames:
-            #with open(f'..\data\final\{filename}.csv', 'r') as f: 
-            with open(os.path.join(os.getcwd(),'data','final',filename+'.csv'), 'r') as f:
+            with open(f'../data/final/{filename}.csv', 'r') as f:
                 cursor.copy_expert(
                         f"COPY {filename.lower()} FROM STDIN WITH HEADER CSV",
                         f)
