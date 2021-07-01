@@ -114,6 +114,6 @@ def app():
         subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
         st.plotly_chart(subfig)
 
-    if st.sidebar.button('Disconnect form database?'):
+    if st.sidebar.button('Disconnect from database?'):
         db.close_connection()
-        st.markdown('Bye bye! :wave:')
+        st.markdown('Disconnected from database! Bye bye! :wave:')

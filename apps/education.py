@@ -90,3 +90,7 @@ def app():
 
         st.write(result['share_gdp_primary'].corr(result2['primary_rate']))
         st.write(result['share_gdp_secondary'].corr(result2['secondary_rate']))
+
+    if st.sidebar.button('Disconnect from database?'):
+        db.close_connection()
+        st.markdown('Disconnected from database! Bye bye! :wave:')

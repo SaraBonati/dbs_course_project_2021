@@ -73,3 +73,7 @@ def app():
         st.dataframe(result)
         fig = px.scatter(result, x="year", y="unemployment_rate",size='homicide_rate')
         st.plotly_chart(fig)
+
+    if st.sidebar.button('Disconnect from database?'):
+        db.close_connection()
+        st.markdown('Disconnected from database! Bye bye! :wave:')
