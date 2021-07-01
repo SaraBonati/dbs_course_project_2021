@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as autocommit
 
 
-def create_tables(dbname):
+def create_tables(dbname, user, password):
     """
     Creates tables in the project's PostgreSQL database
 
@@ -104,8 +104,8 @@ def create_tables(dbname):
         # Connect to PostgreSQL server
         connection = psycopg2.connect(
                 dbname=dbname,
-                user="postgres",
-                password="assign9",
+                user=user,
+                password=password,
                 host="localhost",
                 port="5432")
 
@@ -128,4 +128,4 @@ def create_tables(dbname):
 
 
 if __name__ == "__main__":
-    create_tables("dbs_project")
+    create_tables("dbs_project", "postgres", "postgres")
