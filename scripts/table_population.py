@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as autocommit
 
 
-def populate_tables(dbname, user, password):
+def populate_tables(parameters):
     """
     Populate PostgreSQL tables with data from CSV files
     """
@@ -20,14 +20,9 @@ def populate_tables(dbname, user, password):
 
     try:
         # Connect to PostgreSQL server
-        connection = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                password=password,
-                host="localhost",
-                port="5432")
+        connection = psycopg2.connect(**parameters)
 
-        print(f"\nConnected with database {dbname}")
+        print(f'\nConnected with database {parameters["database"]}')
         connection.set_isolation_level(autocommit)
         cursor = connection.cursor()
 
@@ -40,13 +35,22 @@ def populate_tables(dbname, user, password):
             print(f"Table {filename.lower()} populated.")
 
         print("All done!")
-    except (Exception, psycopg2.Error) as error:
-        print(error)
+    except (psycopg2.Error, psycopg2.DatabaseError) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
     finally:
         if connection:
             cursor.close()
             connection.close()
+            print("Disconnected from PostgreSQL.")
 
 
 if __name__ == "__main__":
-    populate_tables("dbs_project", "postgres", "postgres")
+    params_dict = {
+        "host": "localhost",
+        "port": "5432",
+        "database": "dbs_project",
+        "user": "postgres",
+        "password": "postgres",
+    }
+
+    populate_tables(params_dict)
