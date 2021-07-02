@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import plotly.express as px
 import plotly.graph_objects as go
-#  from plotly.subplots import make_subplots
+from plotly.subplots import make_subplots
 from apps.database_connection import DB
 
 # directory management
@@ -31,6 +31,10 @@ def get_gdp_ranking(df, option_country):
         rankings.append(idx + 1)
     return pd.DataFrame({'Year': years,
                          'Ranking': rankings})
+
+def custom_legend_name(fig,new_names):
+    for i, new_name in enumerate(new_names):
+        fig.data[i].name = new_name
 
 
 def app():
@@ -64,7 +68,8 @@ def app():
     )
 
     # -------------------------------------------------------------------------
-
+    st.write("Where does this country position itself \
+             in the world with respect to GDP?")
     if not len(get_gdp_ranking(gdp, option_country)):
         st.markdown("There is no data available for this \
                     country :disappointed:")
@@ -94,50 +99,51 @@ def app():
         st.plotly_chart(fig)
 
     
-    st.write("What is the human rights situation of this country?")
+    st.write("What is the human rights situation of this country, epxressed in Human Rights (HR) Score?")
 
-    query2 = ("SELECT S.year,S.hr_score,S.hr_violations "
-              "FROM public.security S "
-              "WHERE S.cname='{0}' "
-              "ORDER BY S.year; ").format(option_country)
+    query2 = (
+        f"""
+        SELECT year,hr_score
+        FROM security 
+        WHERE cname='{option_country}' 
+        ORDER BY year; 
+        """
+        )
+    
 
-    result2 = pd.read_sql_query(query2,db.conn)
+    query2_avg = (
+        f"""
+        SELECT year, AVG(hr_score) AS avghr
+        FROM security
+        WHERE cname IN (SELECT name FROM country WHERE partofworld='{option_world}')
+        GROUP BY year
+        ORDER BY year;
+        """
+    )
+
+    result2    = pd.read_sql_query(query2,db.conn)
+    result2avg = pd.read_sql_query(query2_avg,db.conn)
+
     if len(result2)==0:
         st.markdown("There is no data available for this country :disappointed:")
     else:
         st.dataframe(result2)
-        fig2 = px.scatter(result2, x="year", y="hr_score")
+
+        fig2 = px.line(result2, 
+                       x='year',
+                       y=[result2['hr_score'],result2avg["avghr"]])
+        fig2.layout.xaxis.title = "Year"
+        fig2.layout.yaxis.title = "HR Score"
+        custom_legend_name(fig2,['Country HR Score','Average HR score in {option_world}'])
+
         st.plotly_chart(fig2)
 
-    st.write("For some countries there is data on happiness scores: will happier people work less on average?")
+    #st.write("For some countries there is data on happiness scores: will happier people work less on average?")
 
-    query3 = ("SELECT S.year,S.happiness,S.avg_annual_working_hours "
-              "FROM public.security S "
-              "WHERE S.cname='{0}' "
-              "ORDER BY S.year; ").format(option_country)
-
-    result3 = pd.read_sql_query(query3,db.conn)
-    if len(result3)==0:
-        st.markdown("There is no data available for this country :disappointed:")
-    else:
-        st.dataframe(result3)
-        #fig3 = px.scatter(result3, x="year", y="happiness")
-        fig3 = go.Figure()
-
-        fig3.add_trace(
-            go.Scatter(
-                x=result3.year,
-                y=result3.avg_annual_working_hours,
-                mode='lines+markers',
-                name='Average annual working hours'
-            ))
-
-        fig3.add_trace(
-            go.Bar(
-                x=[0, 1, 2, 3, 4, 5],
-                y=[1, 0.5, 0.7, -1.2, 0.3, 0.4]
-            ))
-        st.plotly_chart(fig3)
+    #query3 = ("SELECT S.year,S.happiness,S.avg_annual_working_hours "
+    #          "FROM public.security S "
+    #          "WHERE S.cname='{0}' "
+    #          "ORDER BY S.year; ").format(option_country)
 
 
     if st.sidebar.button('Disconnect from database?'):

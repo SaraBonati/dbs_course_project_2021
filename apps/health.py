@@ -31,6 +31,9 @@ def get_gdp_ranking(df, option_country):
     return pd.DataFrame({'Year': years,
                          'Ranking': rankings})
 
+def custom_legend_name(fig,new_names):
+    for i, new_name in enumerate(new_names):
+        fig.data[i].name = new_name
 
 def app():
     gdp = pd.read_sql_query("SELECT * FROM gdp", db.conn)
@@ -81,17 +84,23 @@ def app():
         WHERE
             G.cname=H.cname
             AND G.year=H.year
+            AND G.year>=1994
             AND G.cname='{option_country}';
         """
     )
 
     result = pd.read_sql_query(query1, db.conn)
+    result['health_value'] = result['share_gdp_health'].divide(100) * result['value']
     if not len(result):
         st.markdown("There is no data available for this \
                     country :disappointed:")
     else:
         st.dataframe(result)
-        fig1 = px.bar(result, x="year", y="share_gdp_health")
+        fig1 = px.bar(result, x="year", y=["value", "health_value"])
+        fig1.layout.xaxis.title = "Year"
+        fig1.layout.yaxis.title = "US Dollars ($)"
+        custom_legend_name(fig1,['Total GDP','Health GDP'])
+        
         st.plotly_chart(fig1)
 
     st.write("What about mental health in this country?")
@@ -103,6 +112,7 @@ def app():
         WHERE
             G.cname=H.cname
             AND G.year=H.year
+            AND G.year>=1990
             AND G.cname='{option_country}';
         """
     )
@@ -122,8 +132,7 @@ def app():
         subfig.add_traces(fig1.data + fig2.data)
         subfig.layout.xaxis.title = "Year"
         subfig.layout.yaxis.title = "Mental health impact (DALY units)"
-        subfig.layout.yaxis2.title = "Share of population with mental \
-                                      health problems"
+        subfig.layout.yaxis2.title = "Share of population with mental health problems"
         # Recoloring is necessary otherwise lines from fig1 und fig2 would
         # share each color e.g. Linear-, Log- = blue; Linear+, Log+ = red
         # ... we don't want this

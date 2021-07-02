@@ -91,7 +91,7 @@ def app():
         f"""
         SELECT year, indoor_death_rate, outdoor_death_rate
         FROM pollution P
-        WHERE cname='{option_world}'
+        WHERE cname='{option_country}'
         AND year>= 1990
         ORDER BY year;
         """

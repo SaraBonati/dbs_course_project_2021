@@ -32,6 +32,9 @@ def get_gdp_ranking(df, option_country):
     return pd.DataFrame({'Year': years,
                          'GDP Ranking': rankings})
 
+def custom_legend_name(fig,new_names):
+    for i, new_name in enumerate(new_names):
+        fig.data[i].name = new_name
 
 def app():
     gdp = pd.read_sql_query("SELECT * FROM gdp", db.conn)
@@ -126,13 +129,11 @@ def app():
         st.dataframe(result2)
         fig2 = px.bar(result2, x="year",
                       y=["primary_rate", "secondary_rate"], barmode='group')
+        fig2.layout.xaxis.title = "Year"
+        fig2.layout.yaxis.title = "Completion rate"
+        custom_legend_name(fig2,['Primary school','Secondary school'])
+        
         st.plotly_chart(fig2)
-
-        st.write(f"Correlation spending primary education to completion: \
-             {result1['share_gdp_primary'].corr(result2['primary_rate']):.4f}")
-
-        st.write(f"Correlation spending primary education to completion: \
-         {result1['share_gdp_secondary'].corr(result2['secondary_rate']):.4f}")
 
     if st.sidebar.button('Disconnect from database?'):
         db.close_connection()
