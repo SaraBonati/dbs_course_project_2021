@@ -2,25 +2,23 @@
 # -*- coding: utf-8 -*-
 
 import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as autocommit
 
 
-def create_tables(dbname, user, password):
-    """
-    Creates tables in the project's PostgreSQL database
+def create_tables(parameters):
+    """Creates tables in the PostgreSQL database
 
-    :dbname: name of the database
+    :parameters: database connection parameters
     """
     commands = (
             """
-            CREATE TABLE country (
+            CREATE TABLE IF NOT EXISTS country (
                 name varchar(50) PRIMARY KEY,
                 code varchar(3) UNIQUE NOT NULL,
                 partofworld varchar(50) NOT NULL
             )
             """,
             """
-            CREATE TABLE population (
+            CREATE TABLE IF NOT EXISTS population (
                 cname varchar(50) NOT NULL,
                 year integer NOT NULL,
                 count bigint,
@@ -33,7 +31,7 @@ def create_tables(dbname, user, password):
             )
             """,
             """
-            CREATE TABLE gdp (
+            CREATE TABLE IF NOT EXISTS gdp (
                 cname varchar(50) NOT NULL,
                 year integer NOT NULL,
                 value numeric(17,2),
@@ -43,7 +41,7 @@ def create_tables(dbname, user, password):
             )
             """,
             """
-            CREATE TABLE health (
+            CREATE TABLE IF NOT EXISTS health (
                 cname varchar(50) NOT NULL,
                 year integer NOT NULL,
                 life_exp numeric(6,3),
@@ -56,7 +54,7 @@ def create_tables(dbname, user, password):
             )
             """,
             """
-            CREATE TABLE pollution (
+            CREATE TABLE IF NOT EXISTS pollution (
                 cname varchar(50) NOT NULL,
                 year integer NOT NULL,
                 co2 numeric(14,3),
@@ -68,7 +66,7 @@ def create_tables(dbname, user, password):
             )
             """,
             """
-            CREATE TABLE education (
+            CREATE TABLE IF NOT EXISTS education (
                 cname varchar(50) NOT NULL,
                 year integer NOT NULL,
                 share_gdp_primary numeric(14,12),
@@ -83,7 +81,7 @@ def create_tables(dbname, user, password):
             )
             """,
             """
-            CREATE TABLE security (
+            CREATE TABLE IF NOT EXISTS security (
                 cname varchar(50) NOT NULL,
                 year integer NOT NULL,
                 unemployment_rate numeric(10,8),
@@ -102,15 +100,10 @@ def create_tables(dbname, user, password):
     connection = None
     try:
         # Connect to PostgreSQL server
-        connection = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                password=password,
-                host="localhost",
-                port="5432")
+        connection = psycopg2.connect(**parameters)
 
-        print(f"\nConnected with database {dbname}")
-        connection.set_isolation_level(autocommit)
+        print("\nPostgreSQL server information:\n")
+        print(f"{connection.get_dsn_parameters()}\n")
 
         cursor = connection.cursor()
 
@@ -118,14 +111,24 @@ def create_tables(dbname, user, password):
         for command in commands:
             cursor.execute(command)
 
+        connection.commit()
         print("Tables created successfully.")
-    except (Exception, psycopg2.Error) as error:
-        print("Error while connecting to PostgreSQL", error)
+    except (psycopg2.Error, psycopg2.DatabaseError) as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
     finally:
         if connection:
             cursor.close()
             connection.close()
+            print("Disconnected from PostgreSQL.")
 
 
 if __name__ == "__main__":
-    create_tables("dbs_project", "postgres", "postgres")
+    params_dict = {
+        "host": "localhost",
+        "port": "5432",
+        "database": "dbs_project",
+        "user": "postgres",
+        "password": "postgres",
+    }
+
+    create_tables(params_dict)
