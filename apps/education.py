@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import os 
 import plotly.express as px
+import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.database_connection import DB
 
@@ -72,7 +73,30 @@ def app():
     else:
         st.dataframe(result)
         fig = px.bar(result, x="year", y=["share_gdp_primary","share_gdp_secondary","share_gdp_tertiary"])
-        st.plotly_chart(fig)
+
+        plot = go.Figure(data=[go.Bar(
+                                    name = r'% GDP spent of primary edu.',
+                                    x = result.year,
+                                    y = result.share_gdp_primary),
+                                go.Bar(
+                                    name = r'% GDP spent of secondary edu.',
+                                    x = result.year,
+                                    y = result.share_gdp_secondary),
+                                go.Bar(
+                                    name = r'% GDP spent of tertiary edu.',
+                                    x = result.year,
+                                    y = result.share_gdp_tertiary),
+                                ])
+ 
+        plot.update_layout(barmode='stack')
+        plot.update_layout(
+                            xaxis_title="Year",
+                            yaxis_title="Share (%)",
+                            font=dict(
+                                family="Courier New, monospace",
+                                size=10,)
+                        )
+        st.plotly_chart(plot)
 
     st.write("Is spending on primary and secondary education correlated with a higher completion rate?")
     query2 = ("SELECT E.year,E.primary_rate,E.secondary_rate "
@@ -81,7 +105,7 @@ def app():
               "ORDER BY E.year; ").format(option_country)
 
     result2 = pd.read_sql_query(query2,db.conn)
-    if len(result2)==0:
+    if len(result2)==0 or result2.iloc[:,1:].isnull().values.all():
         st.markdown("There is no data available for this country :disappointed:")
     else:
         st.dataframe(result2)

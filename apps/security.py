@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import os 
 import plotly.express as px
+import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from apps.database_connection import DB
 
@@ -59,7 +60,7 @@ def app():
     else:
         st.dataframe(get_gdp_ranking(gdp,option_country))
 
-    st.write("Is there a relationship between unemployment rate and homicide rate?")
+    st.write("Is there a relationship between unemployment rate and homicide rate over the years?")
 
     query1 = ("SELECT S.year,S.unemployment_rate,S.homicide_rate "
               "FROM public.security S "
@@ -73,6 +74,53 @@ def app():
         st.dataframe(result)
         fig = px.scatter(result, x="year", y="unemployment_rate",size='homicide_rate')
         st.plotly_chart(fig)
+
+    
+    st.write("What is the human rights situation of this country?")
+
+    query2 = ("SELECT S.year,S.hr_score,S.hr_violations "
+              "FROM public.security S "
+              "WHERE S.cname='{0}' "
+              "ORDER BY S.year; ").format(option_country)
+
+    result2 = pd.read_sql_query(query2,db.conn)
+    if len(result2)==0:
+        st.markdown("There is no data available for this country :disappointed:")
+    else:
+        st.dataframe(result2)
+        fig2 = px.scatter(result2, x="year", y="hr_score")
+        st.plotly_chart(fig2)
+
+    st.write("For some countries there is data on happiness scores: will happier people work less on average?")
+
+    query3 = ("SELECT S.year,S.happiness,S.avg_annual_working_hours "
+              "FROM public.security S "
+              "WHERE S.cname='{0}' "
+              "ORDER BY S.year; ").format(option_country)
+
+    result3 = pd.read_sql_query(query3,db.conn)
+    if len(result3)==0:
+        st.markdown("There is no data available for this country :disappointed:")
+    else:
+        st.dataframe(result3)
+        #fig3 = px.scatter(result3, x="year", y="happiness")
+        fig3 = go.Figure()
+
+        fig3.add_trace(
+            go.Scatter(
+                x=result3.year,
+                y=result3.avg_annual_working_hours,
+                mode='lines+markers',
+                name='Average annual working hours'
+            ))
+
+        fig3.add_trace(
+            go.Bar(
+                x=[0, 1, 2, 3, 4, 5],
+                y=[1, 0.5, 0.7, -1.2, 0.3, 0.4]
+            ))
+        st.plotly_chart(fig3)
+
 
     if st.sidebar.button('Disconnect from database?'):
         db.close_connection()

@@ -7,12 +7,13 @@ import numpy as np
 
 home_text = """
 
-            <style type='text/css'>
+            <style>
             @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&display=swap');
-            body { 
-                font-family: 'IBM Plex Mono', monospace;
-                color: White;
+            body {
+                font-family: 'IBM Plex Mono', sans-serif;
+                color: rgba(0, 0, 0, 0.8);
                 font-size: 20px;
+                padding: 70px;
                 }
             </style>
 
@@ -20,15 +21,14 @@ home_text = """
 
             <h1 align=center> Home </h1>
             <h2 align=center> Group </h2>
-            <h3 align=center> Sara Bonati (Student ID: 5314260) </h3>
-            <h3 align=center> Elica Tokmakchieva (Student ID: 5233090) </h3>
-            <h3 align=center> Tobias Sandmann (Student ID: 5479422) </h3>
+            <p align=center> Sara Bonati (Student ID: 5314260) \ Elica Tokmakchieva (Student ID: 5233090) \ Tobias Sandmann (Student ID: 5479422) </p>
 
             <h2 align=center> What is our project about? </h2>
             <p align=center> Gross Domestic Product (GDP) is one of the main indicators used to represent economical status,
             measuring the value of the final goods and services produced in a country. 
             While this indicator provides a summary measure of economic health, it also
-            provides few insights over aspects such as . In an online publication by [Eurostat](https://ec.europa.eu/eurostat) </p>
+            provides few insights over aspects such as happiness or education. An online article by [Eurostat](https://ec.europa.eu/eurostat) 
+            provides an overview of 9+1 Quality of Life indicators, aspects proposed in the article to  </p>
             <h2 align=center> What is our application? </h2>
             <p align=center> We create an interactive dashboard where users can select a country of interest and visualize the relationship
             between GDP and selected quality fo life indicators. Note that some countries have missing data for some
