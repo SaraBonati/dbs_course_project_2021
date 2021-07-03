@@ -58,7 +58,7 @@ def app():
         fig1.layout.yaxis.title = "US$"
         hf.custom_legend_name(fig1, ['Total GDP', 'Health GDP'])
 
-        st.plotly_chart(fig1)
+        st.plotly_chart(fig1, use_container_width=True)
 
     st.write("What about mental health in this country?")
 
@@ -94,7 +94,7 @@ def app():
         # ... we don't want this
         subfig.for_each_trace(
             lambda t: t.update(line=dict(color=t.marker.color)))
-        st.plotly_chart(subfig)
+        st.plotly_chart(subfig, use_container_width=True)
 
     if st.sidebar.button("Disconnect from database?"):
         db.close_connection()
