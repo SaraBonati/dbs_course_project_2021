@@ -12,7 +12,6 @@ As countries see their GDP increase over the years does _Quality of Life_ follow
 
 ## How to get started?
 First, select one of the pages in the sidebar to the left. Each page contains two drop-down menus to firstly choose the _part of the world_, and secondly the _country_ of interest.
-
 On the main pages you will see tables and _interactive_ diagrams for your chosen country. You can sort the table entries by their columns, interact with the diagrams by zooming into areas of interest, toggle the visibility of single graphs/bars in a diagram, show the diagrams in fullscreen, and so on.
 
 ---

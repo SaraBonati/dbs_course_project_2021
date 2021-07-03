@@ -3,6 +3,7 @@
 # https://github.com/upraneelnihar/streamlit-multiapps)
 
 import streamlit as st
+import numpy as np
 import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -19,30 +20,7 @@ def app():
 
     st.title('Health')
 
-    query_part_of_world = (
-            """
-            SELECT DISTINCT partofworld
-            FROM country;
-            """
-    )
-
-    option_world = st.sidebar.selectbox(
-        "What part of the world do you want to select?",
-        pd.read_sql_query(query_part_of_world, db.conn)
-    )
-
-    query_country = (
-            f"""
-            SELECT DISTINCT name
-            FROM country
-            WHERE partofworld='{option_world}';
-            """
-    )
-
-    option_country = st.sidebar.selectbox(
-            "What country would you like to visualize?",
-            pd.read_sql_query(query_country, db.conn)
-    )
+    option_country, option_world = hf.render_sidebar(db)
 
     # -------------------------------------------------------------------------
 
@@ -67,15 +45,17 @@ def app():
         """
     )
 
-    result = pd.read_sql_query(query1, db.conn)
-    result['health_value'] = result['share_gdp_health'].divide(100) * result['value']
-    if len(result) < 1:
+    result1 = pd.read_sql_query(query1, db.conn)
+    result1.replace(to_replace=[None], value=np.NaN, inplace=True)
+    result1['health_value'] = result1['share_gdp_health'] \
+        .apply(lambda x: (x / 100) if pd.notnull(x) else x) * result1['value']
+    if len(result1) < 1:
         hf.no_data()
     else:
-        st.dataframe(result)
-        fig1 = px.bar(result, x="year", y=["value", "health_value"])
+        st.dataframe(result1)
+        fig1 = px.bar(result1, x="year", y=["value", "health_value"])
         fig1.layout.xaxis.title = "Year"
-        fig1.layout.yaxis.title = "US Dollars ($)"
+        fig1.layout.yaxis.title = "US$"
         hf.custom_legend_name(fig1, ['Total GDP', 'Health GDP'])
 
         st.plotly_chart(fig1)

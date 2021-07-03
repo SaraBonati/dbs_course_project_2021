@@ -20,30 +20,7 @@ def app():
 
     st.title('Education')
 
-    query_part_of_world = (
-            """
-            SELECT DISTINCT partofworld
-            FROM country;
-            """
-    )
-
-    option_world = st.sidebar.selectbox(
-        "What part of the world do you want to select?",
-        pd.read_sql_query(query_part_of_world, db.conn)
-    )
-
-    query_country = (
-            f"""
-            SELECT DISTINCT name
-            FROM country
-            WHERE partofworld='{option_world}';
-            """
-    )
-
-    option_country = st.sidebar.selectbox(
-            "What country would you like to visualize?",
-            pd.read_sql_query(query_country, db.conn)
-    )
+    option_country, option_world = hf.render_sidebar(db)
 
     # -------------------------------------------------------------------------
 

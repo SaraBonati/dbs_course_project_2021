@@ -2,6 +2,7 @@
 # (the multi-app framework is taken from
 # https://github.com/upraneelnihar/streamlit-multiapps)
 
+import os
 from pathlib import Path
 import streamlit as st
 
@@ -11,5 +12,6 @@ def read_markdown_file(markdown_file):
 
 
 def app():
-    home_markdown = read_markdown_file("home.md")
+    script_dir = os.path.dirname(__file__)
+    home_markdown = read_markdown_file(os.path.join(script_dir, "home.md"))
     st.markdown(home_markdown, unsafe_allow_html=True)

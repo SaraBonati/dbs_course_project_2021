@@ -12,7 +12,7 @@ from apps import home, health, pollution, education, security
 
 
 # directory management
-wdir = os.getcwd()                     # working directory
+wdir = os.path.dirname(__file__)       # working directory
 ddir = os.path.join(wdir, 'data')      # data directory
 
 app = MultiApp()
