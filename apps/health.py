@@ -4,16 +4,9 @@
 
 import streamlit as st
 import pandas as pd
-import os
 import plotly.express as px
 from plotly.subplots import make_subplots
-from apps.database_connection import DB
-
-# directory management
-wdir = os.getcwd()
-ddir = os.path.join(wdir, 'data')
-raw_ddir = os.path.join(ddir, 'raw')
-final_ddir = os.path.join(ddir, 'final')
+from database_connection import DB
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
@@ -31,9 +24,11 @@ def get_gdp_ranking(df, option_country):
     return pd.DataFrame({'Year': years,
                          'Ranking': rankings})
 
-def custom_legend_name(fig,new_names):
+
+def custom_legend_name(fig, new_names):
     for i, new_name in enumerate(new_names):
         fig.data[i].name = new_name
+
 
 def app():
     gdp = pd.read_sql_query("SELECT * FROM gdp", db.conn)
@@ -68,10 +63,10 @@ def app():
     # -------------------------------------------------------------------------
 
     st.write("Where does this country position itself \
-             in the world with respect to GDP?")
+              in the world with respect to GDP?")
     if not len(get_gdp_ranking(gdp, option_country)):
         st.markdown("There is no data available for this \
-                    country :disappointed:")
+                     country :disappointed:")
     else:
         st.dataframe(get_gdp_ranking(gdp, option_country))
 
@@ -82,25 +77,25 @@ def app():
         SELECT G.year, G.value, H.share_gdp_health
         FROM gdp G, health H
         WHERE
-            G.cname=H.cname
-            AND G.year=H.year
-            AND G.year>=1994
-            AND G.cname='{option_country}';
+            G.cname=H.cname AND
+            G.year=H.year AND
+            G.year>=1994 AND
+            G.cname='{option_country}';
         """
     )
 
     result = pd.read_sql_query(query1, db.conn)
     result['health_value'] = result['share_gdp_health'].divide(100) * result['value']
-    if not len(result):
+    if len(result) < 1:
         st.markdown("There is no data available for this \
-                    country :disappointed:")
+                     country :disappointed:")
     else:
         st.dataframe(result)
         fig1 = px.bar(result, x="year", y=["value", "health_value"])
         fig1.layout.xaxis.title = "Year"
         fig1.layout.yaxis.title = "US Dollars ($)"
-        custom_legend_name(fig1,['Total GDP','Health GDP'])
-        
+        custom_legend_name(fig1, ['Total GDP', 'Health GDP'])
+
         st.plotly_chart(fig1)
 
     st.write("What about mental health in this country?")
@@ -110,17 +105,17 @@ def app():
         SELECT G.year, G.value, H.mental_health_daly, H.mental_health_share
         FROM gdp G, health H
         WHERE
-            G.cname=H.cname
-            AND G.year=H.year
-            AND G.year>=1990
-            AND G.cname='{option_country}';
+            G.cname=H.cname AND
+            G.year=H.year AND
+            G.year>=1990 AND
+            G.cname='{option_country}';
         """
     )
 
     result2 = pd.read_sql_query(query2, db.conn)
-    if not len(result2):
+    if len(result2) < 1:
         st.markdown("There is no data available for this \
-                    country :disappointed:")
+                     country :disappointed:")
     else:
         subfig = make_subplots(specs=[[{"secondary_y": True}]])
         # Create two independent figures with px.line each containing data from
@@ -143,4 +138,3 @@ def app():
     if st.sidebar.button("Disconnect from database?"):
         db.close_connection()
         st.markdown("Disconnected from database! Bye bye! :wave:")
-

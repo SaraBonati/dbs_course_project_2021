@@ -4,16 +4,10 @@
 
 import streamlit as st
 import pandas as pd
-import os
 import plotly.express as px
 from plotly.subplots import make_subplots
-from apps.database_connection import DB
+from database_connection import DB
 
-# directory management
-wdir = os.getcwd()
-ddir = os.path.join(wdir, 'data')
-raw_ddir = os.path.join(ddir, 'raw')
-final_ddir = os.path.join(ddir, 'final')
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
@@ -33,8 +27,6 @@ def get_gdp_ranking(df, option_country):
 
 
 def app():
-    #  health = pd.read_sql_query("SELECT * FROM health", db.conn)
-    #  country = pd.read_sql_query("SELECT * FROM country", db.conn)
     #  gdp = pd.read_sql_query("SELECT * FROM gdp", db.conn)
 
     st.title('Pollution')
@@ -91,17 +83,19 @@ def app():
         f"""
         SELECT year, indoor_death_rate, outdoor_death_rate
         FROM pollution P
-        WHERE cname='{option_country}'
-        AND year>= 1990
+        WHERE
+            cname='{option_country}' AND
+            year >= 1990
         ORDER BY year;
         """
     )
 
-    result1 = pd.read_sql_query(query1, db.conn)
     st.write("How much CO2 has this country emitted over the years?")
-    if not len(result1):
+
+    result1 = pd.read_sql_query(query1, db.conn)
+    if len(result1) < 1:
         st.markdown("There is no data available for this \
-                    country :disappointed:")
+                     country :disappointed:")
     else:
         fig1 = px.line(result1, x="year", y="co2")
         fig1.update_traces(texttemplate='%{text:.2s}',
@@ -114,8 +108,11 @@ def app():
 
     result2 = pd.read_sql_query(query2, db.conn)
     st.write("How much CO2 overall has the part of the \
-             world of this country emitted over the years?")
-    if len(result2):
+              world of this country emitted over the years?")
+    if len(result2) < 1:
+        st.markdown("There is no data available for this \
+                     country :disappointed:")
+    else:
         fig2 = px.bar(result2, x="year", y="sumco2")
         fig2.update_traces(texttemplate='%{text:.2s}', textposition='outside')
         fig2.update_layout(
@@ -123,16 +120,13 @@ def app():
             yaxis_title=r"Σ CO₂ [t]"
         )
         st.plotly_chart(fig2)
-    else:
-        st.markdown("There is no data available for this \
-                    country :disappointed:")
 
     result3 = pd.read_sql_query(query3, db.conn)
     st.write("What are the indoor and outdoor death rates \
-             realted to pollution in this country?")
-    if not len(result3):
+              realted to pollution in this country?")
+    if len(result3) < 1:
         st.markdown("There is no data available for this \
-                    country :disappointed:")
+                     country :disappointed:")
     else:
         st.dataframe(result3)
         subfig = make_subplots(specs=[[{"secondary_y": True}]])

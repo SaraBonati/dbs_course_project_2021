@@ -5,16 +5,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
 import plotly.express as px
 #  from plotly.subplots import make_subplots
-from apps.database_connection import DB
-
-# directory management
-wdir = os.getcwd()
-ddir = os.path.join(wdir, 'data')
-raw_ddir = os.path.join(ddir, 'raw')
-final_ddir = os.path.join(ddir, 'final')
+from database_connection import DB
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
@@ -32,9 +25,11 @@ def get_gdp_ranking(df, option_country):
     return pd.DataFrame({'Year': years,
                          'GDP Ranking': rankings})
 
-def custom_legend_name(fig,new_names):
+
+def custom_legend_name(fig, new_names):
     for i, new_name in enumerate(new_names):
         fig.data[i].name = new_name
+
 
 def app():
     gdp = pd.read_sql_query("SELECT * FROM gdp", db.conn)
@@ -69,10 +64,10 @@ def app():
     # -------------------------------------------------------------------------
 
     st.write("Where does this country position itself \
-             in the world with respect to GDP?")
+              in the world with respect to GDP?")
     if not len(get_gdp_ranking(gdp, option_country)):
         st.markdown("There is no data available for this \
-                    country :disappointed:")
+                     country :disappointed:")
     else:
         st.dataframe(get_gdp_ranking(gdp, option_country))
 
@@ -93,7 +88,7 @@ def app():
 
     result1 = pd.read_sql_query(query1, db.conn)
     result1.replace(to_replace=[None], value=np.nan, inplace=True)
-    if not len(result1):
+    if len(result1) < 1:
         st.markdown("There is no data available for this \
                      country :disappointed:")
     else:
@@ -122,17 +117,18 @@ def app():
     )
 
     result2 = pd.read_sql_query(query2, db.conn)
-    if not len(result2):
+    if len(result2) < 1:
         st.markdown("There is no data available for this \
                      country :disappointed:")
     else:
         st.dataframe(result2)
-        fig2 = px.bar(result2, x="year",
+        fig2 = px.bar(result2,
+                      x="year",
                       y=["primary_rate", "secondary_rate"], barmode='group')
         fig2.layout.xaxis.title = "Year"
         fig2.layout.yaxis.title = "Completion rate"
-        custom_legend_name(fig2,['Primary school','Secondary school'])
-        
+        custom_legend_name(fig2, ['Primary school', 'Secondary school'])
+
         st.plotly_chart(fig2)
 
     if st.sidebar.button('Disconnect from database?'):
