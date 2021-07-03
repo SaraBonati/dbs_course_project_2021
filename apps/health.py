@@ -52,7 +52,13 @@ def app():
     if len(result1) < 1:
         hf.no_data()
     else:
-        st.dataframe(result1)
+        table1 = result1.rename(
+            columns={'year': "Year",
+                     'value': "GDP [US$]",
+                     'share_gdp_health': "GDP on Health [%]",
+                     'health_value': "GDP on Health [US$]"},
+            inplace=False)
+        st.dataframe(table1)
         fig1 = px.bar(result1, x="year", y=["value", "health_value"])
         fig1.layout.xaxis.title = "Year"
         fig1.layout.yaxis.title = "US$"

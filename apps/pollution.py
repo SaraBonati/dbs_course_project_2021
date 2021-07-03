@@ -56,7 +56,7 @@ def app():
         """
     )
 
-    st.write("How much CO2 has this country emitted over the years?")
+    st.write("How much CO$_2$ has this country emitted over the years?")
 
     result1 = pd.read_sql_query(query1, db.conn)
     if len(result1) < 1:
@@ -72,7 +72,7 @@ def app():
         st.plotly_chart(fig1)
 
     result2 = pd.read_sql_query(query2, db.conn)
-    st.write("How much CO2 overall has the part of the \
+    st.write("How much CO$_2$ overall has the part of the \
               world of this country emitted over the years?")
     if len(result2) < 1:
         hf.no_data()
@@ -87,11 +87,16 @@ def app():
 
     result3 = pd.read_sql_query(query3, db.conn)
     st.write("What are the indoor and outdoor death rates \
-              realted to pollution in this country?")
+              related to pollution in this country?")
     if len(result3) < 1:
         hf.no_data()
     else:
-        st.dataframe(result3)
+        table3 = result3.rename(
+            columns={"year": "Year",
+                     "indoor_death_rate": "Indoor death rate",
+                     "outdoor_death_rate": "Outdoor death rate"},
+            inplace=False)
+        st.dataframe(table3)
         subfig = make_subplots(specs=[[{"secondary_y": True}]])
         # create two independent figures with px.line each containing data from
         # multiple columns

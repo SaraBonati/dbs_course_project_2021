@@ -40,16 +40,25 @@ def app():
         """
     )
 
-    result = pd.read_sql_query(query1, db.conn)
-    if len(result) < 1:
+    result1 = pd.read_sql_query(query1, db.conn)
+    if len(result1) < 1:
         hf.no_data()
     else:
-        st.dataframe(result)
-        fig = px.scatter(result,
-                         x="year",
-                         y="unemployment_rate",
-                         size='homicide_rate')
-        st.plotly_chart(fig)
+        table1 = result1.rename(
+            columns={'year': "Year",
+                     'unemployment_rate': "Unemployment rate",
+                     'homicide_rate': "Homicide rate"},
+            inplace=False)
+        st.dataframe(table1)
+        fig1 = px.scatter(result1,
+                          x="year",
+                          y="unemployment_rate",
+                          size='homicide_rate')
+        fig1.update_layout(
+            xaxis_title="Year",
+            yaxis1_title="Unemployment rate"
+        )
+        st.plotly_chart(fig1, use_container_width=True)
 
     st.write("What is the human rights situation of this country, \
               epxressed in Human Rights (HR) Score?")
@@ -81,7 +90,11 @@ def app():
     if len(result2) < 1:
         hf.no_data()
     else:
-        st.dataframe(result2)
+        table2 = result2.rename(
+            columns={'year': "Year",
+                     'hr_score': "Human rights score"},
+            inplace=False)
+        st.dataframe(table2)
 
         fig2 = px.line(result2,
                        x='year',
