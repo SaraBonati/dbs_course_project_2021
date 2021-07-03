@@ -7,23 +7,12 @@ import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
 from database_connection import DB
+import helper_function as hf
 
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
 db = DB('dbs_project')
-
-
-def get_gdp_ranking(df, option_country):
-    years = [1960, 1970, 1980, 1990, 2000, 2010, 2019]
-    rankings = []
-    for year in years:
-        r = df[df['year'] == year] \
-                .sort_values(by='value', ascending=False).reset_index()
-        idx = r.index[r['cname'] == option_country][0]
-        rankings.append(idx + 1)
-    return pd.DataFrame({'Year': years,
-                         'Ranking': rankings})
 
 
 def app():
@@ -94,8 +83,7 @@ def app():
 
     result1 = pd.read_sql_query(query1, db.conn)
     if len(result1) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         fig1 = px.line(result1, x="year", y="co2")
         fig1.update_traces(texttemplate='%{text:.2s}',
@@ -110,8 +98,7 @@ def app():
     st.write("How much CO2 overall has the part of the \
               world of this country emitted over the years?")
     if len(result2) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         fig2 = px.bar(result2, x="year", y="sumco2")
         fig2.update_traces(texttemplate='%{text:.2s}', textposition='outside')
@@ -125,8 +112,7 @@ def app():
     st.write("What are the indoor and outdoor death rates \
               realted to pollution in this country?")
     if len(result3) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         st.dataframe(result3)
         subfig = make_subplots(specs=[[{"secondary_y": True}]])

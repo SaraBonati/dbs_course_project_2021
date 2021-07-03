@@ -6,27 +6,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from database_connection import DB
+import helper_function as hf
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
 db = DB('dbs_project')
-
-
-def get_gdp_ranking(df, option_country):
-    years = [1960, 1970, 1980, 1990, 2000, 2010, 2019]
-    rankings = []
-    for year in years:
-        r = df[df['year'] == year] \
-                .sort_values(by='value', ascending=False).reset_index()
-        idx = r.index[r['cname'] == option_country][0]
-        rankings.append(idx + 1)
-    return pd.DataFrame({'Year': years,
-                         'Ranking': rankings})
-
-
-def custom_legend_name(fig, new_names):
-    for i, new_name in enumerate(new_names):
-        fig.data[i].name = new_name
 
 
 def app():
@@ -62,11 +46,10 @@ def app():
     # -------------------------------------------------------------------------
     st.write("Where does this country position itself \
               in the world with respect to GDP?")
-    if not len(get_gdp_ranking(gdp, option_country)):
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+    if not len(hf.get_gdp_ranking(gdp, option_country)):
+        hf.no_data()
     else:
-        st.dataframe(get_gdp_ranking(gdp, option_country))
+        st.dataframe(hf.get_gdp_ranking(gdp, option_country))
 
     st.write("Is there a relationship between unemployment \
               rate and homicide rate?")
@@ -82,8 +65,7 @@ def app():
 
     result = pd.read_sql_query(query1, db.conn)
     if len(result) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         st.dataframe(result)
         fig = px.scatter(result,
@@ -120,8 +102,7 @@ def app():
     result2_avg = pd.read_sql_query(query2_avg, db.conn)
 
     if len(result2) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         st.dataframe(result2)
 
@@ -130,7 +111,7 @@ def app():
                        y=[result2['hr_score'], result2_avg["avghr"]])
         fig2.layout.xaxis.title = "Year"
         fig2.layout.yaxis.title = "HR Score"
-        custom_legend_name(fig2, ['Country HR Score', f'Average HR score in {option_world}'])
+        hf.custom_legend_name(fig2, ['Country HR Score', f'Average HR score in {option_world}'])
 
         st.plotly_chart(fig2)
 

@@ -8,27 +8,11 @@ import numpy as np
 import plotly.express as px
 #  from plotly.subplots import make_subplots
 from database_connection import DB
+import helper_function as hf
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
 db = DB('dbs_project')
-
-
-def get_gdp_ranking(df, option_country):
-    years = [1960, 1970, 1980, 1990, 2000, 2010, 2019]
-    rankings = []
-    for year in years:
-        r = df[df['year'] == year] \
-                .sort_values(by='value', ascending=False).reset_index()
-        idx = r.index[r['cname'] == option_country][0]
-        rankings.append(idx + 1)
-    return pd.DataFrame({'Year': years,
-                         'GDP Ranking': rankings})
-
-
-def custom_legend_name(fig, new_names):
-    for i, new_name in enumerate(new_names):
-        fig.data[i].name = new_name
 
 
 def app():
@@ -65,11 +49,10 @@ def app():
 
     st.write("Where does this country position itself \
               in the world with respect to GDP?")
-    if not len(get_gdp_ranking(gdp, option_country)):
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+    if len(hf.get_gdp_ranking(gdp, option_country)) < 1:
+        hf.no_data()
     else:
-        st.dataframe(get_gdp_ranking(gdp, option_country))
+        st.dataframe(hf.get_gdp_ranking(gdp, option_country))
 
     st.write("What share of its GDP does this country spend on education?")
 
@@ -89,8 +72,7 @@ def app():
     result1 = pd.read_sql_query(query1, db.conn)
     result1.replace(to_replace=[None], value=np.nan, inplace=True)
     if len(result1) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         st.dataframe(result1)
         fig1 = px.bar(result1, x="year", y=["share_gdp_primary",
@@ -118,8 +100,7 @@ def app():
 
     result2 = pd.read_sql_query(query2, db.conn)
     if len(result2) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         st.dataframe(result2)
         fig2 = px.bar(result2,
@@ -127,7 +108,7 @@ def app():
                       y=["primary_rate", "secondary_rate"], barmode='group')
         fig2.layout.xaxis.title = "Year"
         fig2.layout.yaxis.title = "Completion rate"
-        custom_legend_name(fig2, ['Primary school', 'Secondary school'])
+        hf.custom_legend_name(fig2, ['Primary school', 'Secondary school'])
 
         st.plotly_chart(fig2)
 

@@ -7,27 +7,11 @@ import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
 from database_connection import DB
+import helper_function as hf
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
 db = DB('dbs_project')
-
-
-def get_gdp_ranking(df, option_country):
-    years = [1960, 1970, 1980, 1990, 2000, 2010, 2019]
-    rankings = []
-    for year in years:
-        r = df[df['year'] == year] \
-                .sort_values(by='value', ascending=False).reset_index()
-        idx = r.index[r['cname'] == option_country][0]
-        rankings.append(idx + 1)
-    return pd.DataFrame({'Year': years,
-                         'Ranking': rankings})
-
-
-def custom_legend_name(fig, new_names):
-    for i, new_name in enumerate(new_names):
-        fig.data[i].name = new_name
 
 
 def app():
@@ -64,11 +48,10 @@ def app():
 
     st.write("Where does this country position itself \
               in the world with respect to GDP?")
-    if not len(get_gdp_ranking(gdp, option_country)):
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+    if len(hf.get_gdp_ranking(gdp, option_country)) < 1:
+        hf.no_data()
     else:
-        st.dataframe(get_gdp_ranking(gdp, option_country))
+        st.dataframe(hf.get_gdp_ranking(gdp, option_country))
 
     st.write("What share of its GDP does this country spend on health?")
 
@@ -87,14 +70,13 @@ def app():
     result = pd.read_sql_query(query1, db.conn)
     result['health_value'] = result['share_gdp_health'].divide(100) * result['value']
     if len(result) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         st.dataframe(result)
         fig1 = px.bar(result, x="year", y=["value", "health_value"])
         fig1.layout.xaxis.title = "Year"
         fig1.layout.yaxis.title = "US Dollars ($)"
-        custom_legend_name(fig1, ['Total GDP', 'Health GDP'])
+        hf.custom_legend_name(fig1, ['Total GDP', 'Health GDP'])
 
         st.plotly_chart(fig1)
 
@@ -114,8 +96,7 @@ def app():
 
     result2 = pd.read_sql_query(query2, db.conn)
     if len(result2) < 1:
-        st.markdown("There is no data available for this \
-                     country :disappointed:")
+        hf.no_data()
     else:
         subfig = make_subplots(specs=[[{"secondary_y": True}]])
         # Create two independent figures with px.line each containing data from
