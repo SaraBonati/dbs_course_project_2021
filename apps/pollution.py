@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
 from apps.database_connection import DB
-import helper_function as hf
+import apps.helper_function as hf
 
 
 # database class (to handle connecion to DB + execute and retrieve query
