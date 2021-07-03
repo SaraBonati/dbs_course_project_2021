@@ -18,7 +18,8 @@ def render_sidebar(db):
     query_part_of_world = (
             """
             SELECT DISTINCT partofworld
-            FROM country;
+            FROM country
+            ORDER BY partofworld ASC;
             """
     )
 
@@ -31,7 +32,8 @@ def render_sidebar(db):
             f"""
             SELECT DISTINCT name
             FROM country
-            WHERE partofworld='{option_world}';
+            WHERE partofworld='{option_world}'
+            ORDER BY name ASC
             """
     )
 
