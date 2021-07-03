@@ -8,7 +8,7 @@ import numpy as np
 import plotly.express as px
 #  from plotly.subplots import make_subplots
 from apps.database_connection import DB
-import apps.helper_function as hf
+import apps.helper_functions as hf
 
 # database class (to handle connecion to DB + execute and retrieve query
 # results)
