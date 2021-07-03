@@ -15,7 +15,6 @@ from apps import home, health, pollution, education, security
 wdir = os.getcwd()                     # working directory
 ddir = os.path.join(wdir, 'data')      # data directory
 
-
 app = MultiApp()
 
 # Add all your application here

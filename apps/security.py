@@ -5,7 +5,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database_connection import DB
+from apps.database_connection import DB
 import helper_function as hf
 
 # database class (to handle connecion to DB + execute and retrieve query
