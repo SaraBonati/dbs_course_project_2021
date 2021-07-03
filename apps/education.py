@@ -51,12 +51,19 @@ def app():
     if len(result1) < 1:
         hf.no_data()
     else:
-        st.dataframe(result1)
+        table1 = result1.rename(
+            columns={'year': "Year",
+                     'share_gdp_primary': "%GDP primary edu",
+                     'share_gdp_secondary': "%GDP secondary edu",
+                     'share_gdp_tertiary': "%GDP tertiary edu"
+                    },
+            inplace=False)
+        st.dataframe(table1)
         fig1 = px.bar(result1, x="year", y=["share_gdp_primary",
                       "share_gdp_secondary", "share_gdp_tertiary"])
         fig1.update_layout(
             xaxis_title="Year",
-            yaxis1_title="Share GDP spent on Education"
+            yaxis1_title="Share GDP spent on Education (%)"
         )
         st.plotly_chart(fig1)
 
@@ -79,7 +86,13 @@ def app():
     if len(result2) < 1:
         hf.no_data()
     else:
-        st.dataframe(result2)
+        table2 = result2.rename(
+            columns={'year': "Year",
+                     'primary_rate': "Rate primary edu",
+                     'secondary_rate': "Rate secondary edu",
+                    },
+            inplace=False)
+        st.dataframe(table2)
         fig2 = px.bar(result2,
                       x="year",
                       y=["primary_rate", "secondary_rate"], barmode='group')
