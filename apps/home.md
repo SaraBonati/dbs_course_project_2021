@@ -8,7 +8,7 @@ An [online article](https://ec.europa.eu/eurostat/statistics-explained/index.php
 ## What is our application?
 We created an interactive dashboard where users can select a country of interest and visualize the relationship between GDP and selected _Quality of Life_ indicators. Note that some countries have missing data for some indicators (which will be signaled by the application).
 
-As countries see their GDP increase over the years, does _Quality of Life_ follow this increase over all its possible facets? As the economy grows and more funds are put into e.g. education and health, do the quality of these services also increase?
+The application connects automatically at app launch to a database *dbs_project_2021*; the user can also decide to disconnect from the database.
 
 ## How to get started?
 First, select one of the pages in the sidebar to the left. Each page contains two drop-down menus to firstly choose the _part of the world_, and secondly the _country_ of interest.

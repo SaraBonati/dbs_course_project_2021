@@ -25,7 +25,7 @@ def app():
     # -------------------------------------------------------------------------
 
     st.write("Where does this country position itself \
-              in the world with respect to GDP?")
+              in a worldwide GDP ranking over the years?")
     if len(hf.get_gdp_ranking(gdp, option_country)) < 1:
         hf.no_data()
     else:
@@ -67,8 +67,8 @@ def app():
         )
         st.plotly_chart(fig1)
 
-    st.write("Is spending on primary and secondary education \
-              correlated with a higher completion rate?")
+    st.write("What is the impact of spending on primary and secondary education \
+              on school completion rates?")
 
     query2 = (
         f"""

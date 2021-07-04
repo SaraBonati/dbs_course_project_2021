@@ -22,7 +22,7 @@ def app():
 
     # -------------------------------------------------------------------------
     st.write("Where does this country position itself \
-              in the world with respect to GDP?")
+              in a worldwide GDP ranking over the years?")
     if not len(hf.get_gdp_ranking(gdp, option_country)):
         hf.no_data()
     else:
@@ -61,7 +61,7 @@ def app():
         st.plotly_chart(fig1, use_container_width=True)
 
     st.write("What is the human rights situation of this country, \
-              epxressed in Human Rights (HR) Score?")
+              expressed in Human Rights (HR) Score?")
 
     query2 = (
         f"""
